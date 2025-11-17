@@ -20,6 +20,9 @@ This project simulates a production-grade enterprise reliability system with:
 - **Dual-region failover** with sub-second latency
 - **Interactive SRE dashboard** for monitoring and control
 
+  <img width="1499" height="821" alt="Screenshot 2025-11-16 at 4 41 47 PM" src="https://github.com/user-attachments/assets/2f6c89ca-4075-4006-a2f3-d2f0c735f87d" />
+
+
 ### Architecture
 
 ```
@@ -110,6 +113,9 @@ Simulates 100,000 devices across 10 sites:
 - **Thermal Engines** (25,000 devices)
 - **Electrical Rotors** (25,000 devices)
 - **Connected Oil & Gas Sensors** (25,000 devices)
+
+<img width="1493" height="818" alt="Screenshot 2025-11-16 at 4 42 35 PM" src="https://github.com/user-attachments/assets/2e69da37-e2c8-4716-8935-760781b83f39" />
+
 
 **MQTT Topic Convention**: `og/field/{site_id}/{device_type}/{device_id}`
 
@@ -523,4 +529,5 @@ This project is for educational purposes as part of CMPE 273 coursework.
 - FastAPI framework
 - React team
 - Cohere for AI embeddings API
+
 

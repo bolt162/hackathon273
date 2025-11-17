@@ -4,7 +4,7 @@
 
 A complete Tier-0 Enterprise Reliability System demonstrating 99.99999% (seven-nines) availability with real-time IoT telemetry, AI-driven analytics, and agentic automation.
 
-#Video Link:
+# Video Link:
 https://drive.google.com/file/d/1K-k7483Sse8cARChbZt1kYNHobX4IxsL/view?usp=drive_link
 
 ---
@@ -20,7 +20,7 @@ This project simulates a production-grade enterprise reliability system with:
 - **Dual-region failover** with sub-second latency
 - **Interactive SRE dashboard** for monitoring and control
 
-  <img width="1499" height="821" alt="Screenshot 2025-11-16 at 4 41 47 PM" src="https://github.com/user-attachments/assets/2f6c89ca-4075-4006-a2f3-d2f0c735f87d" />
+<img width="1499" height="821" alt="Screenshot 2025-11-16 at 4 41 47 PM" src="https://github.com/user-attachments/assets/2f6c89ca-4075-4006-a2f3-d2f0c735f87d" />
 
 
 ### Architecture
@@ -529,5 +529,6 @@ This project is for educational purposes as part of CMPE 273 coursework.
 - FastAPI framework
 - React team
 - Cohere for AI embeddings API
+
 
 

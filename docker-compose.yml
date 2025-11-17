@@ -1,0 +1,224 @@
+version: '3.8'
+
+services:
+  # MQTT Broker for IoT telemetry
+  mosquitto:
+    image: eclipse-mosquitto:2.0
+    container_name: mqtt-broker
+    ports:
+      - "1883:1883"
+      - "9001:9001"
+    volumes:
+      - ./config/mosquitto.conf:/mosquitto/config/mosquitto.conf
+      - mosquitto-data:/mosquitto/data
+      - mosquitto-logs:/mosquitto/log
+    networks:
+      - sre-network
+
+  # RabbitMQ for user activity messages
+  rabbitmq:
+    image: rabbitmq:3.12-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: admin
+      RABBITMQ_DEFAULT_PASS: admin123
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+    networks:
+      - sre-network
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis Stack for state, vector search, JSON, time-series (Region 1)
+  redis-region1:
+    image: redis/redis-stack:latest
+    container_name: redis-region1
+    ports:
+      - "6379:6379"
+      - "8001:8001"  # RedisInsight
+    volumes:
+      - redis-region1-data:/data
+    networks:
+      - sre-network
+    environment:
+      - REDIS_ARGS=--appendonly yes
+
+  # Redis Stack for state, vector search, JSON, time-series (Region 2 - Failover)
+  redis-region2:
+    image: redis/redis-stack:latest
+    container_name: redis-region2
+    ports:
+      - "6380:6379"
+      - "8002:8001"  # RedisInsight
+    volumes:
+      - redis-region2-data:/data
+    networks:
+      - sre-network
+    environment:
+      - REDIS_ARGS=--appendonly yes
+
+  # Backend API - Region 1
+  backend-region1:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: backend-region1
+    ports:
+      - "8000:8000"
+    environment:
+      - REGION=region1
+      - REDIS_HOST=redis-region1
+      - REDIS_PORT=6379
+      - MQTT_BROKER=mosquitto
+      - RABBITMQ_HOST=rabbitmq
+      - COHERE_API_KEY=${COHERE_API_KEY:-}
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+    depends_on:
+      - redis-region1
+      - mosquitto
+      - rabbitmq
+    networks:
+      - sre-network
+    volumes:
+      - ./backend:/app
+      - ./CMPE273HackathonData:/data
+
+  # Backend API - Region 2 (Failover)
+  backend-region2:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: backend-region2
+    ports:
+      - "8100:8000"
+    environment:
+      - REGION=region2
+      - REDIS_HOST=redis-region2
+      - REDIS_PORT=6379
+      - MQTT_BROKER=mosquitto
+      - RABBITMQ_HOST=rabbitmq
+      - COHERE_API_KEY=${COHERE_API_KEY:-}
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+    depends_on:
+      - redis-region2
+      - mosquitto
+      - rabbitmq
+    networks:
+      - sre-network
+    volumes:
+      - ./backend:/app
+      - ./CMPE273HackathonData:/data
+
+  # IoT Device Simulator
+  iot-simulator:
+    build:
+      context: ./simulators
+      dockerfile: Dockerfile.iot
+    container_name: iot-simulator
+    environment:
+      - MQTT_BROKER=mosquitto
+      - MQTT_PORT=1883
+      - NUM_DEVICES=100000
+      - NUM_SITES=10
+    depends_on:
+      - mosquitto
+    networks:
+      - sre-network
+    volumes:
+      - ./DataTemplates:/templates
+
+  # User Activity Simulator
+  user-simulator:
+    build:
+      context: ./simulators
+      dockerfile: Dockerfile.user
+    container_name: user-simulator
+    environment:
+      - RABBITMQ_HOST=rabbitmq
+      - RABBITMQ_PORT=5672
+      - RABBITMQ_USER=admin
+      - RABBITMQ_PASS=admin123
+    depends_on:
+      - rabbitmq
+    networks:
+      - sre-network
+    volumes:
+      - ./DataTemplates:/templates
+
+  # MQTT Consumer
+  mqtt-consumer:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: mqtt-consumer
+    environment:
+      - REGION=region1
+      - REDIS_HOST=redis-region1
+      - REDIS_PORT=6379
+      - MQTT_BROKER=mosquitto
+      - MQTT_PORT=1883
+    depends_on:
+      - redis-region1
+      - mosquitto
+    networks:
+      - sre-network
+    command: sh -c "export PYTHONPATH=/app && python -u app/consumers/mqtt_consumer.py"
+    volumes:
+      - ./backend:/app
+
+  # RabbitMQ Consumer
+  rabbitmq-consumer:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: rabbitmq-consumer
+    environment:
+      - REGION=region1
+      - REDIS_HOST=redis-region1
+      - REDIS_PORT=6379
+      - RABBITMQ_HOST=rabbitmq
+      - RABBITMQ_PORT=5672
+      - RABBITMQ_USER=admin
+      - RABBITMQ_PASS=admin123
+    depends_on:
+      - redis-region1
+      - rabbitmq
+    networks:
+      - sre-network
+    command: sh -c "export PYTHONPATH=/app && python -u app/consumers/rabbitmq_consumer.py"
+    volumes:
+      - ./backend:/app
+
+  # Frontend Dashboard
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - REACT_APP_API_REGION1=http://localhost:8000
+      - REACT_APP_API_REGION2=http://localhost:8100
+    depends_on:
+      - backend-region1
+      - backend-region2
+    networks:
+      - sre-network
+
+networks:
+  sre-network:
+    driver: bridge
+
+volumes:
+  mosquitto-data:
+  mosquitto-logs:
+  rabbitmq-data:
+  redis-region1-data:
+  redis-region2-data:

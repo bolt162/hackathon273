@@ -4,9 +4,12 @@
 
 A complete Tier-0 Enterprise Reliability System demonstrating 99.99999% (seven-nines) availability with real-time IoT telemetry, AI-driven analytics, and agentic automation.
 
+#Video Link:
+https://drive.google.com/file/d/1K-k7483Sse8cARChbZt1kYNHobX4IxsL/view?usp=drive_link
+
 ---
 
-## 🎯 Project Overview
+## Project Overview
 
 This project simulates a production-grade enterprise reliability system with:
 
@@ -49,7 +52,7 @@ This project simulates a production-grade enterprise reliability system with:
 
 ---
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Prerequisites
 
@@ -97,7 +100,7 @@ docker-compose logs -f
 
 ---
 
-## 📊 System Components
+## System Components
 
 ### 1. IoT Telemetry Simulation (MQTT)
 
@@ -181,7 +184,7 @@ Analyzes system logs with:
 
 ---
 
-## 🔧 API Endpoints
+## API Endpoints
 
 ### Core Endpoints
 
@@ -235,7 +238,7 @@ Analyzes system logs with:
 
 ---
 
-## 🧪 Testing
+## Testing
 
 ### Run System Integration Tests
 
@@ -259,7 +262,7 @@ Testing: Root Endpoint
 ...
 
 Results: 25/25 tests passed (100.0%)
-🎉 All tests passed!
+All tests passed!
 ```
 
 ### Run Failover Test
@@ -367,7 +370,7 @@ python user_simulator.py
 
 ---
 
-## 🎓 Educational Context
+## Educational Context
 
 This project demonstrates key concepts from CMPE 273:
 
@@ -384,7 +387,7 @@ This project demonstrates key concepts from CMPE 273:
 
 ---
 
-## 📊 Performance Metrics
+## Performance Metrics
 
 - **Device Throughput**: 100,000 messages/second
 - **Failover Latency**: < 0.01 seconds
@@ -395,7 +398,7 @@ This project demonstrates key concepts from CMPE 273:
 
 ---
 
-## 🔍 Troubleshooting
+## Troubleshooting
 
 ### Services won't start
 ```bash
@@ -433,7 +436,7 @@ cat frontend/src/App.js | grep API_
 
 ---
 
-## 📚 Technology Stack
+## Technology Stack
 
 - **Backend**: FastAPI, Python 3.11
 - **Frontend**: React 18
@@ -445,7 +448,7 @@ cat frontend/src/App.js | grep API_
 
 ---
 
-## 🎯 Key Features Demonstrated
+## Key Features Demonstrated
 
 ✅ IoT telemetry simulation (100K devices)
 ✅ Real-time message queue processing
@@ -460,7 +463,7 @@ cat frontend/src/App.js | grep API_
 
 ---
 
-## 📝 Sample API Responses
+## Sample API Responses
 
 ### GET /api/status
 ```json
@@ -498,20 +501,21 @@ cat frontend/src/App.js | grep API_
 
 ---
 
-## 👥 Contributors
+## Contributors
 
-CMPE 273 - Fall 2025
-San José State University
+Alekya Gudise
+Akansha Bansiya
+Kartikey Sharma
 
 ---
 
-## 📄 License
+## License
 
 This project is for educational purposes as part of CMPE 273 coursework.
 
 ---
 
-## 🙏 Acknowledgments
+## Acknowledgments
 
 - Eclipse Mosquitto for MQTT broker
 - RabbitMQ team for message queue
@@ -519,3 +523,4 @@ This project is for educational purposes as part of CMPE 273 coursework.
 - FastAPI framework
 - React team
 - Cohere for AI embeddings API
+
